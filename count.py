@@ -1,5 +1,4 @@
 import discord
-import datetime
 from dotenv import dotenv_values
 
 TOKEN = dotenv_values(".env")["TOKEN"]
@@ -13,9 +12,7 @@ class Client(discord.Client):
             votes[member] = 0
             try:
                 dm = await member.create_dm()
-                message = await dm.history(limit=1, oldest_first=False,
-                                           after=datetime.datetime.now() - datetime.timedelta(
-                                               days=1)).flatten()
+                message = await dm.history(limit=1, oldest_first=False).flatten()
                 if message:
                     message = message[0].content.split()
                     if message[0] == "!vote" and not members[int(message[1]) - 1] == member:
