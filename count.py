@@ -1,3 +1,4 @@
+import datetime
 import discord
 from dotenv import dotenv_values
 
@@ -10,15 +11,19 @@ class Client(discord.Client):
         votes = {}
         for member in members:
             votes[member] = 0
+        for member in members:
             try:
                 dm = await member.create_dm()
-                message = await dm.history(limit=1, oldest_first=False).flatten()
-                if message:
-                    message = message[0].content.split()
+                messages = await dm.history(limit=5, oldest_first=False,
+                                            after=datetime.datetime.now() - datetime.timedelta(
+                                                days=2)).flatten()
+                for message in messages:
+                    message = message.content.split()
                     if message[0] == "!vote" and not members[int(message[1]) - 1] == member:
                         votes[members[int(message[1]) - 1]] += 1
+                        break
             except Exception as e:
-                print(e)
+                print(repr(e))
         sortedvotes = sorted(votes, key=votes.get, reverse=True)
         msg = "@everyone The election has ended and the results are are:\n"
         for i, member in enumerate(sortedvotes):
